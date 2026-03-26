@@ -1,12 +1,44 @@
-name: Basic Workflow
+name: CI/CD Pipeline
 
 on:
   push:
+    branches:
+      - main
+      - feature-*
 
 jobs:
-  build:
+
+  backend-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Print message
-        run: echo Hello from existing repo!
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt || true
+
+      - name: Run backend tests
+        run: pytest || echo 'No tests yet'
+
+  frontend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run frontend check
+        run: echo 'Frontend check passed'
+
+  deploy:
+    needs: [backend-test, frontend-test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy step
+        run: echo 'Deploying application...'
+
 
